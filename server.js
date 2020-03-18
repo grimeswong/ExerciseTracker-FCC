@@ -35,7 +35,7 @@ const userScheme = new mongoose.Schema({
 const USER = mongoose.model('USER', userScheme);
 
 /* starting point */
-app.route('/api/exercise/new-user').post((req, res) => {
+app.post('/api/exercise/new-user', (req, res) => {
   console.log(req.body.username);
 
   // todo: Check whether the username has been taken, if not save to database
@@ -59,9 +59,7 @@ app.route('/api/exercise/new-user').post((req, res) => {
           })
         })
       }
-
   })
-
 })
 
 // Not found middleware
