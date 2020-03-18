@@ -6,7 +6,13 @@ require('dotenv').config();
 const cors = require('cors')
 
 const mongoose = require('mongoose')
-mongoose.connect(process.env.MLAB_URI || 'mongodb://localhost/exercise-track' )
+mongoose.Promise = global.Promise;
+const connectDB = mongoose.connect(process.env.DB_URI, {useNewUrlParser: true, useUnifiedTopology: true})
+  .then(()=> {
+    console.log("Database is connected successfully!");
+  })
+  .catch(error => console.error(`Cannot connect to the database due to ${error}`));
+
 
 app.use(cors())
 
@@ -42,6 +48,10 @@ app.use((err, req, res, next) => {
   }
   res.status(errCode).type('txt')
     .send(errMessage)
+})
+
+app.post('/api/exercise/new-user', (req, res) => {
+  console.log(req.body.username);
 })
 
 const listener = app.listen(process.env.PORT || 3000, () => {

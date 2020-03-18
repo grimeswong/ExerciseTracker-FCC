@@ -7,16 +7,16 @@
 		"start": "nodemon server.js"
 	},
 	"dependencies": {
-		"body-parser": "^1.15.2",
-		"cors": "^2.8.1",
-		"dotenv": "^8.2.0",
-		"express": "^4.14.0",
-		"mongodb": "^2.2.14",
-		"mongoose": "^4.7.2",
-		"shortid": "^2.2.6"
+		"body-parser": "^1.19.0",
+		"cors": "^2.8.5",
+		"express": "^4.17.1",
+		"mongodb": "^3.3.3",
+		"mongoose": "^5.7.7",
+		"mongoose-sequence": "^5.2.2",
+		"sha1": "^1.1.1"
 	},
 	"engines": {
-		"node": "6.9.1"
+		"node": "10.17.0"
 	},
 	"repository": {
 		"url": "https://gomix.com/#!/project/welcome-project"
@@ -28,6 +28,7 @@
 		"express"
 	],
 	"devDependencies": {
-		"nodemon": "^2.0.2"
+		"nodemon": "^2.0.2",
+		"dotenv": "^8.2.0"
 	}
 }
