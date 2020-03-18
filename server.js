@@ -2,6 +2,7 @@ const express = require('express')
 const app = express()
 const bodyParser = require('body-parser')
 require('dotenv').config();
+const shortid = require('shortid')
 
 const cors = require('cors')
 
@@ -25,6 +26,43 @@ app.get('/', (req, res) => {
   res.sendFile(__dirname + '/views/index.html')
 });
 
+/* Database */
+const userScheme = new mongoose.Schema({
+  _id: {type: String, required: true},
+  username: {type: String, required: true}
+});
+
+const USER = mongoose.model('USER', userScheme);
+
+/* starting point */
+app.route('/api/exercise/new-user').post((req, res) => {
+  console.log(req.body.username);
+
+  // todo: Check whether the username has been taken, if not save to database
+  USER.findOne({username: req.body.username}, (err, result) => {
+    if(err!==null) {console.error(err)};     // catch error
+
+      if(result!==null) { // condition: the username was taken
+        res.send('username was taken, please choose another one!!!')
+      } else {
+        // new username can be save to database
+        let user = USER({
+          _id: shortid.generate(),
+          username: req.body.username
+        })
+        user.save((err, savedData) => {
+          if(err!==null) {console.error(err)}
+          console.log(savedData);
+          res.json({
+            username: savedData.username,
+            _id: savedData._id
+          })
+        })
+      }
+
+  })
+
+})
 
 // Not found middleware
 app.use((req, res, next) => {
@@ -48,10 +86,6 @@ app.use((err, req, res, next) => {
   }
   res.status(errCode).type('txt')
     .send(errMessage)
-})
-
-app.post('/api/exercise/new-user', (req, res) => {
-  console.log(req.body.username);
 })
 
 const listener = app.listen(process.env.PORT || 3000, () => {
