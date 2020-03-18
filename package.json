@@ -13,7 +13,8 @@
 		"mongodb": "^3.3.3",
 		"mongoose": "^5.7.7",
 		"mongoose-sequence": "^5.2.2",
-		"sha1": "^1.1.1"
+		"sha1": "^1.1.1",
+		"shortid": "^2.2.15"
 	},
 	"engines": {
 		"node": "10.17.0"
