@@ -106,6 +106,30 @@ app.post('/api/exercise/add', (req, res) => { //body -> userId, description, dur
   })
 });
 
+// Get the user exercise logs
+app.get('/api/exercise/log/', function(req, res) {
+  console.log(`req.params = ${req.query.userId}`);
+  USER.findOne({_id: req.query.userId}, (err, resultArr) => {
+    if(err!==null) { console.error(err)
+    } else {
+      console.log(typeof(resultArr.exercise));
+      res.json({
+        _id: resultArr._id,
+        username: resultArr.username,
+        count: resultArr.exercise.length,
+        log: resultArr.exercise.map((exercise)=>{
+          return ({
+            description: exercise.description,
+            duration: exercise.duration,
+            date: moment(exercise.date).format('ddd MMM DD YYYY'),
+          })
+        })
+      })
+    }
+  })
+})
+
+
 // Not found middleware
 app.use((req, res, next) => {
   return next({status: 404, message: 'not found'})
