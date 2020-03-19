@@ -108,11 +108,30 @@ app.post('/api/exercise/add', (req, res) => { //body -> userId, description, dur
 
 // Get the user exercise logs
 app.get('/api/exercise/log/', function(req, res) {
-  console.log(`req.params = ${req.query.userId}`);
-  USER.findOne({_id: req.query.userId}, (err, resultArr) => {
-    if(err!==null) { console.error(err)
-    } else {
-      console.log(typeof(resultArr.exercise));
+  console.log(`req.query userId = ${req.query.userId}`);
+  console.log(`req.query from = ${req.query.from}`)
+  console.log(`req.query to = ${req.query.to}`)
+  console.log(`req.query limit = ${req.query.limit}`)
+
+  const validateDate = (from, to) => {
+    if (!(isNaN(req.query.from) && isNaN(req.query.to))) {  // condition: from and to are a number
+      return false;
+    }
+
+    return true;
+  }
+
+  // Queries Options
+  let queryFullLog = {_id: req.query.userId }
+  const queryLimitLog = {_id: req.query.userId }
+
+  query = (req.query.from && req.query.to) === undefined ? queryFullLog : queryLimitLog
+  console.log(`Query = ${JSON.stringify(query)}`)
+
+  USER.findOne( query , (err, resultArr) => {
+    if(err!==null) { console.error(err)}
+    console.log(`result Arr = ${resultArr}`);
+    if(resultArr !== null) {
       res.json({
         _id: resultArr._id,
         username: resultArr.username,
@@ -125,6 +144,8 @@ app.get('/api/exercise/log/', function(req, res) {
           })
         })
       })
+    } else {
+      res.send("No result is found!!!")
     }
   })
 })
