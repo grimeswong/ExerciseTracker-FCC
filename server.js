@@ -29,12 +29,17 @@ app.get('/', (req, res) => {
 /* Database */
 const userScheme = new mongoose.Schema({
   _id: {type: String, required: true},
-  username: {type: String, required: true}
+  username: {type: String, required: true},
+  exercise: [
+    {description: {type: String, required: true}},
+    {duration: {type: Number, min: 0}},
+    {date: {type: Date}}
+  ]
 });
 
 const USER = mongoose.model('USER', userScheme);
 
-/* starting point */
+// Create a new user
 app.post('/api/exercise/new-user', (req, res) => {
   console.log(req.body.username);
 
@@ -61,6 +66,20 @@ app.post('/api/exercise/new-user', (req, res) => {
       }
   })
 })
+
+// Add exercises
+app.post('/api/exercise/add', (req, res) => { //body -> userId, description, duration, date (all String)
+  console.log(`id = ${JSON.stringify(req.body.userId)}`);
+  USER.findOne({_id: req.body.userId}, (err, result) => {
+    if(err!==null) {console.error(err)}
+    if(result===null) { // couldn't find the user
+      res.send("Invalid user ID");
+    } else {
+      console.log("Check data is valid or not");
+      console.log(validateData(req.body.description, req.body.duration, req.body.date))
+    }
+  })
+});
 
 // Not found middleware
 app.use((req, res, next) => {
@@ -89,3 +108,27 @@ app.use((err, req, res, next) => {
 const listener = app.listen(process.env.PORT || 3000, () => {
   console.log('Your app is listening on port ' + listener.address().port)
 })
+
+// Functions
+const validateData = (desc, dura, date) => {
+  if(desc === "") {console.log("desc");return false}  // description must have some content
+  console.log(desc);
+
+  const numRegex = /^\d{1,}$/g   // duration has one digit at least
+  if(!numRegex.test(dura) ) {
+    console.log("Contain characters")
+    if(dura !=="") {
+      return false
+    }
+  }
+  const dateRegex = /[\d]{4}-[\d]{2}-[\d]{2}/g   // Must comply the format (yyyy-mm-dd)
+  if(!dateRegex.test(date)){ // it can be nothing
+    if(date !=="") {
+      console.log("date")
+      return false
+    }
+  }
+  console.log(date);
+
+  return true;  // pass all the test
+}
