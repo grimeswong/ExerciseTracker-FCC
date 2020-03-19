@@ -30,11 +30,11 @@ app.get('/', (req, res) => {
 const userScheme = new mongoose.Schema({
   _id: {type: String, required: true},
   username: {type: String, required: true},
-  exercise: [
-    {description: {type: String, required: true}},
-    {duration: {type: Number, min: 0}},
-    {date: {type: Date}}
-  ]
+  exercise: [{
+    description: {type: String, required: true},
+    duration: {type: Number, min: 0, required: true},
+    date: {type: Date, required: true}
+  }]
 });
 
 const USER = mongoose.model('USER', userScheme);
@@ -77,7 +77,26 @@ app.post('/api/exercise/add', (req, res) => { //body -> userId, description, dur
     } else {
       console.log("Check data is valid or not");
       if(validateData(req.body.description, req.body.duration, req.body.date) === true) {
-
+        USER.findOneAndUpdate({_id: req.body.userId},
+          {$push:
+            {exercise: {
+              description: req.body.description,
+              duration: parseInt(req.body.duration),
+              date: req.body.date==="" ? new Date() : new Date(req.body.date) // if no date provided, use current date
+            }}
+          },
+          {useFindAndModify: false, new: true},  //options
+          (err, data)=> {
+            if(err!==null) {console.error(err)}
+            console.log("update a user exercise!!!")
+            console.log(data);
+            res.json({  // response the last exercise added
+              username: data.username,
+              description: data.exercise[data.exercise.length-1].description,
+              duration: data.exercise[data.exercise.length-1].duration,
+              date: data.exercise[data.exercise.length-1].date,
+            })
+          })
       } else {
         res.send("Invalid details, please enter the correct format!!!")
       }
