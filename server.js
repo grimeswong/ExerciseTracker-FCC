@@ -76,7 +76,11 @@ app.post('/api/exercise/add', (req, res) => { //body -> userId, description, dur
       res.send("Invalid user ID");
     } else {
       console.log("Check data is valid or not");
-      console.log(validateData(req.body.description, req.body.duration, req.body.date))
+      if(validateData(req.body.description, req.body.duration, req.body.date) === true) {
+
+      } else {
+        res.send("Invalid details, please enter the correct format!!!")
+      }
     }
   })
 });
@@ -111,24 +115,25 @@ const listener = app.listen(process.env.PORT || 3000, () => {
 
 // Functions
 const validateData = (desc, dura, date) => {
-  if(desc === "") {console.log("desc");return false}  // description must have some content
-  console.log(desc);
+  if(desc === "") {   // description must have some content
+    console.log("desc will return false");
+    return false
+  }
 
   const numRegex = /^\d{1,}$/g   // duration has one digit at least
-  if(!numRegex.test(dura) ) {
-    console.log("Contain characters")
+  if(!numRegex.test(dura)) {
     if(dura !=="") {
+      console.log("duration will return false");
       return false
     }
   }
   const dateRegex = /[\d]{4}-[\d]{2}-[\d]{2}/g   // Must comply the format (yyyy-mm-dd)
   if(!dateRegex.test(date)){ // it can be nothing
     if(date !=="") {
-      console.log("date")
+      console.log("date will return false");
       return false
     }
   }
-  console.log(date);
-
+  console.log("will return true");
   return true;  // pass all the test
 }
