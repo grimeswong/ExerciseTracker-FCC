@@ -3,6 +3,7 @@ const app = express()
 const bodyParser = require('body-parser')
 require('dotenv').config();
 const shortid = require('shortid')
+const moment = require('moment')
 
 const cors = require('cors')
 
@@ -90,11 +91,12 @@ app.post('/api/exercise/add', (req, res) => { //body -> userId, description, dur
             if(err!==null) {console.error(err)}
             console.log("update a user exercise!!!")
             console.log(data);
+            const recentAddExercise = data.exercise[data.exercise.length-1];
             res.json({  // response the last exercise added
               username: data.username,
-              description: data.exercise[data.exercise.length-1].description,
-              duration: data.exercise[data.exercise.length-1].duration,
-              date: data.exercise[data.exercise.length-1].date,
+              description: recentAddExercise.description,
+              duration: recentAddExercise.duration,
+              date: moment(recentAddExercise.date).format('ddd MMM DD YYYY'),
             })
           })
       } else {
