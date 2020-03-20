@@ -113,22 +113,39 @@ app.get('/api/exercise/log/', function(req, res) {
   console.log(`req.query to = ${req.query.to}`)
   console.log(`req.query limit = ${req.query.limit}`)
 
-  const validateDate = (from, to) => {
-    if (!(isNaN(req.query.from) && isNaN(req.query.to))) {  // condition: from and to are a number
-      return false;
-    }
-    return true;
-  }
-
   USER.findOne( {_id: req.query.userId } , (err, resultArr) => {
-    if(err!==null) { console.error(err)}
+    if(err!==null) { console.error(err) } // catch error
     console.log(`result Arr = ${resultArr}`);
-    if(resultArr !== null) {
-      res.json(responseDetails(resultArr));
+    if(resultArr === null) {
+      res.send("Couldn't found user");
     } else {
-      res.send("No result is found!!!")
+      console.log(req.query);
+      if((req.query.from && req.query.to) !== undefined) {
+        console.log("to display limit exercise logs");
+        let queryFrom = new Date(req.query.from);
+        let queryTo = new Date(req.query.to);
+        console.log(queryTo);
+        console.log(queryFrom);
+        if((validateDate(queryTo) && validateDate(queryFrom)) === true) {
+          let limitExercise = [];
+          limitExercise = resultArr.exercise.filter((exercise) => {
+            return exercise.date.getTime() >= queryFrom.getTime() && exercise.date.getTime() <= queryTo.getTime();
+          })
+          resultArr.exercise = limitExercise;
+          console.log(resultArr);
+          res.json(responseDetails(resultArr));
+        } else {
+          console.log("Date format error catch");
+          res.send("Incorrect date format");
+        }
+
+      } else {
+        console.log("to display whole exercise logs");
+        res.json(responseDetails(resultArr));
+      }
     }
   })
+
 })
 
 
@@ -186,6 +203,13 @@ const validateData = (desc, dura, date) => {
   return true;  // pass all the test
 }
 
+// function for validate date
+const validateDate = (date) => {
+  if (!isNaN(date) && date instanceof Date) {
+    return true;
+  }
+  return false;
+}
 
 // function for display the query details
 const responseDetails = (userObj) => {
