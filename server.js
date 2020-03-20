@@ -117,33 +117,14 @@ app.get('/api/exercise/log/', function(req, res) {
     if (!(isNaN(req.query.from) && isNaN(req.query.to))) {  // condition: from and to are a number
       return false;
     }
-
     return true;
   }
 
-  // Queries Options
-  let queryFullLog = {_id: req.query.userId }
-  const queryLimitLog = {_id: req.query.userId }
-
-  query = (req.query.from && req.query.to) === undefined ? queryFullLog : queryLimitLog
-  console.log(`Query = ${JSON.stringify(query)}`)
-
-  USER.findOne( query , (err, resultArr) => {
+  USER.findOne( {_id: req.query.userId } , (err, resultArr) => {
     if(err!==null) { console.error(err)}
     console.log(`result Arr = ${resultArr}`);
     if(resultArr !== null) {
-      res.json({
-        _id: resultArr._id,
-        username: resultArr.username,
-        count: resultArr.exercise.length,
-        log: resultArr.exercise.map((exercise)=>{
-          return ({
-            description: exercise.description,
-            duration: exercise.duration,
-            date: moment(exercise.date).format('ddd MMM DD YYYY'),
-          })
-        })
-      })
+      res.json(responseDetails(resultArr));
     } else {
       res.send("No result is found!!!")
     }
@@ -180,6 +161,7 @@ const listener = app.listen(process.env.PORT || 3000, () => {
 })
 
 // Functions
+// function to validate data and return whether all data is valid (boolean)
 const validateData = (desc, dura, date) => {
   if(desc === "") {   // description must have some content
     console.log("desc will return false");
@@ -202,4 +184,21 @@ const validateData = (desc, dura, date) => {
   }
   console.log("will return true");
   return true;  // pass all the test
+}
+
+
+// function for display the query details
+const responseDetails = (userObj) => {
+  return ({
+    _id: userObj._id,
+    username: userObj.username,
+    count: userObj.length,
+    log: userObj.exercise.map((exercise) => {
+      return({
+        description: exercise.description,
+        duration: exercise.duration,
+        date: moment(exercise.date).format('ddd MMM DD YYYY')
+      })
+    })
+  })
 }
