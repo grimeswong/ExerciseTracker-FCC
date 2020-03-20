@@ -131,7 +131,8 @@ app.get('/api/exercise/log/', function(req, res) {
           limitExercise = resultArr.exercise.filter((exercise) => {
             return exercise.date.getTime() >= queryFrom.getTime() && exercise.date.getTime() <= queryTo.getTime();
           })
-          resultArr.exercise = limitExercise;
+          console.log(typeof(req.query.limit))
+          req.query.limit!== undefined ? resultArr.exercise = limitExercise.splice(req.query.limit): resultArr.exercise = limitExercise;
           console.log(resultArr);
           res.json(responseDetails(resultArr));
         } else {
